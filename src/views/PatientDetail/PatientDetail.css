@@ -1,0 +1,8 @@
+.nav-tabs .nav-link.active {
+    background-color: #ffffff; /* Cambia esto al color que desees */
+    color: #000000; /* Color del texto */
+}
+
+.nav-tabs .nav-link {
+    color: #ccc; /* Color del texto por defecto */
+}

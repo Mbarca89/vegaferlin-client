@@ -1,0 +1,129 @@
+.custom-bg {
+  background-color: #632f6b;
+}
+
+.custom-bg:hover {
+  background-color: #77285a;
+}
+
+.custom-border {
+  border: none;
+}
+
+.custom-font {
+  color: rgb(186, 186, 186)
+}
+
+.cardContainer {
+  height: 500px;
+  width: 700px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5%;
+}
+
+.card {
+  --bg: #e8e8e8;
+  --contrast: #e2e0e0;
+  --grey: #93a1a1;
+  position: relative;
+  padding: 9px;
+  background-color: var(--bg);
+  border-radius: 35px;
+  cursor: pointer;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-conic-gradient(var(--bg) 0.0000001%, var(--grey) 0.000104%) 60% 60%/600% 600%;
+  filter: opacity(10%) contrast(105%);
+}
+
+.card-inner {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  width: 190px;
+  height: 254px;
+  background-color: var(--contrast);
+  border-radius: 30px;
+  /* Content style */
+  font-size: 30px;
+  font-weight: 900;
+  color: #c7c4c4;
+  text-align: center;
+  font-family: monospace;
+}
+
+.custom-nav:hover, .custom-nav:focus {
+  color: #000 !important; /* Mantener el color de la letra en hover y focus */
+  background-color: #fff; /* Opcional: cambiar el color de fondo en hover */
+  text-decoration: none; /* Evitar subrayado */
+}
+
+@media (max-width: 992px) {
+  .h-sm-25 {
+    height: 25%;
+  }
+
+  .h-sm-40 {
+    height: 40%;
+  }
+
+  .h-sm-50 {
+    height: 50%;
+  }
+
+  .h-sm-75 {
+    height: 75%;
+  }
+
+  .h-sm-100 {
+    height: 100%;
+  }
+
+  .w-sm-50 {
+    width: 50%;
+  }
+
+  .w-sm-75 {
+    width: 75%;
+  }
+
+  .w-sm-100 {
+    width: 100%;
+  }
+
+}
+
+@media (min-width: 992px) {
+  .h-lg-100 {
+    height: 100%;
+  }
+
+  .h-lg-75 {
+    height: 75%;
+  }
+
+  .h-lg-50 {
+    height: 50%;
+  }
+
+  .w-lg-25 {
+    width: 25%;
+  }
+
+  .w-lg-50 {
+    width: 50%;
+  }
+
+  .w-lg-100 {
+    width: 100%;
+  }
+}

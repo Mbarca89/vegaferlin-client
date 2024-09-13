@@ -1,0 +1,94 @@
+.odontogram {
+    min-height: 100vh;
+}
+
+.tooth {
+    width: 40px;
+    height: 40px;
+}
+
+.left {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(0 0, 25% 25%, 25% 75%, 0% 100%);
+}
+
+.left:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.top {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(0 0, 100% 0, 75% 25%, 25% 25%);
+}
+
+.top:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.right {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(75% 25%, 100% 0, 100% 100%, 75% 75%);
+}
+
+.right:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.bot {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(25% 75%, 75% 75%, 100% 100%, 0 100%);
+}
+
+.bot:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.center {
+    height: 100%;
+    width: 100%;
+    clip-path: polygon(25% 25%, 75% 25%, 75% 75%, 25% 75%);
+}
+
+.center:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.context-menu {
+    position: fixed;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.pendingCrown {
+    position: absolute;
+    clip-path: none;
+    background-image: url("/images/pendingcrown.png");
+}
+
+.crown {
+    position: absolute;
+    clip-path: none;
+    background-image: url("/images/crown.png");
+}
+
+.pendingExtraction {
+    position: absolute;
+    clip-path: none;
+    background-image: url("/images/pendingextraction.png");
+}
+
+.extraction {
+    position: absolute;
+    clip-path: none;
+    background-image: url("/images/extraction.png");
+}
