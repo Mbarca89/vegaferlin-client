@@ -326,22 +326,23 @@ export interface WorkPlan {
 } 
 
 export interface ToothType {
-    left: string;
-    top: string;
-    right: string;
-    bot: string;
-    center: string;
+    D: string;
+    V: string;
+    M: string;
+    L: string;
+    O: string;
 }
 
-export interface Quadrant {
-    top1: Map<number, Tooth>;
-    top2: Map<number, Tooth>;
-    bottom1: Map<number, Tooth>;
-    bottom2: Map<number, Tooth>;
+export interface treatment {
+    code: string
+    description: string
+    piece: string
+    faces: string
+    status: string
 }
 
 export interface Odontogram {
-    left: Quadrant;
-    right: Quadrant;
+    teeth: Map<number, ToothType>;
+    treatments: treantment[]
 }
 

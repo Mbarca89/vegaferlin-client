@@ -19,7 +19,6 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [image, setImage] = useState<File | null>(null);
     const [dirtyForm, setDirtyForm] = useRecoilState(formState)
-    setDirtyForm(true)
 
     const validate = (values: patient): patient => {
         const errors: any = {};
@@ -149,7 +148,6 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
             const formData = new FormData();
             if (image) formData.append('file', image);
             formData.append('patient', JSON.stringify(createPatient));
-
             try {
                 const res = await axiosWithToken.post(`${SERVER_URL}/api/patients/create`, formData)
                 notifySuccess(res.data)
@@ -178,9 +176,9 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
 
 
     useEffect(() => {
-        if(formik.isSubmitting && Object.keys(formik.errors).length) notifyError("Ingrese los datos marcados con *")
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[formik.isSubmitting])
+        if (formik.isSubmitting && Object.keys(formik.errors).length) notifyError("Ingrese los datos marcados con *")
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [formik.isSubmitting])
 
     return (
         <div className='container d-flex flex-column bg-dark-800'>
@@ -196,7 +194,7 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                             onChange={(e) => {
                                 const selectedValue = e.target.value;
                                 formik.handleChange(e);
-                
+
                                 const selectedUser = users.find(user => `${user.name} ${user.surname}` === selectedValue);
                                 if (selectedUser) {
                                     formik.setFieldValue('inChargeOfId', selectedUser.id);
@@ -234,7 +232,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="name"
                                     name="name"
                                     value={formik.values.name}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.name && formik.errors.name)}
                                 />
@@ -245,7 +246,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="surname"
                                     name="surname"
                                     value={formik.values.surname}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.surname && formik.errors.surname)}
                                 />
@@ -256,7 +260,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="docType"
                                     name="docType"
                                     value={formik.values.docType}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.docType && formik.errors.docType)}
                                 >
@@ -271,7 +278,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="doc"
                                     name="doc"
                                     value={formik.values.doc}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.doc && formik.errors.doc)}
                                 />
@@ -282,7 +292,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="gender"
                                     name="gender"
                                     value={formik.values.gender}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.gender && formik.errors.gender)}
                                 >
@@ -297,7 +310,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="birth"
                                     name="birth"
                                     value={formik.values.birth}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.birth && formik.errors.birth)}
                                 />
@@ -308,7 +324,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="nationality"
                                     name="nationality"
                                     value={formik.values.nationality}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.nationality && formik.errors.nationality)}
                                 />
@@ -319,7 +338,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="civilState"
                                     name="civilState"
                                     value={formik.values.civilState}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.civilState && formik.errors.civilState)}
                                 >
@@ -336,7 +358,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="country"
                                     name="country"
                                     value={formik.values.country}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.country && formik.errors.country)}
                                 />
@@ -347,7 +372,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="state"
                                     name="state"
                                     value={formik.values.state}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.state && formik.errors.state)}
                                 />
@@ -358,7 +386,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="city"
                                     name="city"
                                     value={formik.values.city}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.city && formik.errors.city)}
                                 />
@@ -369,7 +400,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="address"
                                     name="address"
                                     value={formik.values.address}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.address && formik.errors.address)}
                                 />
@@ -380,7 +414,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="derivedBy"
                                     name="derivedBy"
                                     value={formik.values.derivedBy}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.derivedBy && formik.errors.derivedBy)}
                                 />
@@ -397,7 +434,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="phone"
                                     name="phone"
                                     value={formik.values.phone}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.phone && formik.errors.phone)}
                                 />
@@ -408,7 +448,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="email"
                                     name="email"
                                     value={formik.values.email}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.email && formik.errors.email)}
                                 />
@@ -423,7 +466,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="occupation"
                                     name="occupation"
                                     value={formik.values.occupation}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                 />
                             </Form.Group>
@@ -433,7 +479,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="studies"
                                     name="studies"
                                     value={formik.values.studies}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                     isInvalid={!!(formik.touched.studies && formik.errors.studies)}
                                 >
@@ -452,7 +501,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="workAddress"
                                     name="workAddress"
                                     value={formik.values.workAddress}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                 />
                             </Form.Group>
@@ -462,7 +514,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="workingHours"
                                     name="workingHours"
                                     value={formik.values.workingHours}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                 />
                             </Form.Group>
@@ -476,7 +531,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="social"
                                     name="social"
                                     value={formik.values.social}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                 />
                             </Form.Group>
@@ -486,7 +544,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                                     id="socialNumber"
                                     name="socialNumber"
                                     value={formik.values.socialNumber}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => {
+                                        setDirtyForm(true)
+                                        formik.handleChange(e)
+                                    }}
                                     onBlur={formik.handleBlur}
                                 />
                             </Form.Group>
@@ -501,7 +562,10 @@ const CreatePatient: React.FC<createPatientProps> = ({ updateList }) => {
                             id="observations"
                             name="observations"
                             value={formik.values.observations}
-                            onChange={formik.handleChange}
+                            onChange={(e) => {
+                                setDirtyForm(true)
+                                formik.handleChange(e)
+                            }}
                             onBlur={formik.handleBlur}
                         />
                     </Form.Group>
