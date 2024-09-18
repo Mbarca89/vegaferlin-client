@@ -163,7 +163,7 @@ const PatienDetail = () => {
                     {currentTab === "workPlan" ? <PatientWotkPlan patientId={patient.id} inChargeOfId={patient.inChargeOfId} /> : null}
                     {currentTab === "surgicalProtocol" ? <PatientSurgicalProtocol patientId={patient.id} inChargeOfId={patient.inChargeOfId} /> : null}
                     {currentTab === "surgicalProtocolDetail" ? <SurgicalProtocolDetail/> : null}
-                    {currentTab === "odontogram" ? <PatientOdontogram/> : null}
+                    {currentTab === "odontogram" ? <PatientOdontogram patientId={patient.id}/> : null}
                 </div>
             </div>
             {showAlert && <AlertModal/>}

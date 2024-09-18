@@ -344,5 +344,6 @@ export interface treatment {
 export interface Odontogram {
     teeth: Map<number, ToothType>;
     treatments: treantment[]
+    odontogramDate: string
 }
 

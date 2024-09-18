@@ -75,6 +75,8 @@ const Tooth = <T extends keyof Odontogram>({ number, status }: ToothProps<T>) =>
                         <img style={{ height: "80px" }} src={`/images/teeth/${number}.png`} alt="" />
                         <img className={status.O === "Pendiente-Perno" ? "position-absolute start-0" : "d-none"} src="/images/toppendingscrew.png" alt="" />
                         <img className={status.O === "Realizado-Perno" ? "position-absolute start-0" : "d-none"} src="/images/topscrew.png" alt="" />
+                        <img className={status.O === "Pendiente-Conducto" ? "position-absolute start-0" : "d-none"} src="/images/toppendingconduct.png" alt="" />
+                        <img className={status.O === "Realizado-Conducto" ? "position-absolute start-0" : "d-none"} src="/images/topconduct.png" alt="" />
                         <div className="tooth bg-light position-relative" onClick={(e) => e.stopPropagation()}>
                             <img className="position-absolute V-0 start-0" src="/images/teeth.png" alt="" />
                             <div className={`left ${status.D.replaceAll(".", "-")}`} />
@@ -179,6 +181,8 @@ const Tooth = <T extends keyof Odontogram>({ number, status }: ToothProps<T>) =>
                     <img style={{ height: "80px" }} src={`/images/teeth/${number}.png`} alt="" />
                     <img className={status.O === "Pendiente-Perno" ? "position-absolute start-0" : "d-none"} src="/images/botpendingscrew.png" alt="" />
                     <img className={status.O === "Realizado-Perno" ? "position-absolute start-0" : "d-none"} src="/images/botscrew.png" alt="" />
+                    <img className={status.O === "Pendiente-Conducto" ? "position-absolute start-0" : "d-none"} src="/images/botpendingconduct.png" alt="" />
+                    <img className={status.O === "Realizado-Conducto" ? "position-absolute start-0" : "d-none"} src="/images/botconduct.png" alt="" />
                 </div>
             );
     }

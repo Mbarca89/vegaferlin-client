@@ -7,7 +7,7 @@ import { modalState } from "../../../app/store"
 import { useRecoilState } from "recoil"
 import { useNavigate } from 'react-router-dom';
 import handleError from '../../../utils/HandleErrors';
-import { Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import DeletePatient from '../DetelePatient/DetelePatient';
 const SERVER_URL = import.meta.env.VITE_REACT_APP_SERVER_URL;
 
@@ -56,9 +56,45 @@ const PatientList = () => {
         setShow(!show);
     };
 
+    const handleSearch = async (event: any) => {
+        setLoading(true)
+        let searchTerm
+        event.preventDefault()
+        if (event.type == "submit") searchTerm = event.target[0].value
+        try {
+            const res = await axiosWithToken.get(`${SERVER_URL}/api/patients/search?searchTerm=${searchTerm}`)
+            if (res.data) {
+                setPatients(res.data);
+            }
+            setLoading(false)
+        } catch (error: any) {
+            handleError(error)
+            setLoading(false)
+        }
+    }
+
+    const handleResetSearch = (event: any) => {
+        if (event.target.value == "") getPatients()
+    }
+
     return (
         <div className='text-nowrap'>
             <h2 className="mb-5 text-light">Pacientes</h2>
+            <Form onSubmit={handleSearch} className='mb-3'>
+                        <Row>
+                            <Col xs="auto">
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Buscar"
+                                    className=" mr-sm-2"
+                                    onChange={handleResetSearch}
+                                />
+                            </Col>
+                            <Col xs="auto">
+                                <Button type="submit">Buscar</Button>
+                            </Col>
+                        </Row>
+                    </Form>
             {!loading ? <Table striped bordered hover size="sm" variant="dark">
                 <thead>
                     <tr>

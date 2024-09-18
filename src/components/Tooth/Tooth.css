@@ -14,9 +14,9 @@
     clip-path: polygon(0 0, 25% 25%, 25% 75%, 0% 100%);
 }
 
-.left:hover {
+/* .left:hover {
     background-color: rgba(0, 0, 0, 0.2);
-}
+} */
 
 .top {
     position: absolute;
@@ -25,9 +25,9 @@
     clip-path: polygon(0 0, 100% 0, 75% 25%, 25% 25%);
 }
 
-.top:hover {
+/* .top:hover {
     background-color: rgba(0, 0, 0, 0.2);
-}
+} */
 
 .right {
     position: absolute;
@@ -36,9 +36,9 @@
     clip-path: polygon(75% 25%, 100% 0, 100% 100%, 75% 75%);
 }
 
-.right:hover {
+/* .right:hover {
     background-color: rgba(0, 0, 0, 0.2);
-}
+} */
 
 .bot {
     position: absolute;
@@ -47,9 +47,9 @@
     clip-path: polygon(25% 75%, 75% 75%, 100% 100%, 0 100%);
 }
 
-.bot:hover {
+/* .bot:hover {
     background-color: rgba(0, 0, 0, 0.2);
-}
+} */
 
 .center {
     height: 100%;
@@ -57,9 +57,9 @@
     clip-path: polygon(25% 25%, 75% 25%, 75% 75%, 25% 75%);
 }
 
-.center:hover {
+/* .center:hover {
     background-color: rgba(0, 0, 0, 0.2);
-}
+} */
 
 /* .context-menu {
     position: fixed;
