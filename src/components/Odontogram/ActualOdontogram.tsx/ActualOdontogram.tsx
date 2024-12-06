@@ -1,5 +1,5 @@
 import { ReactEventHandler, useEffect, useState } from "react";
-import type { Odontogram, ToothType } from "../../../types";
+import type { Odontogram, ToothType, treatment } from "../../../types";
 import OdontogramChart from "../../Odontogram/Odontogram";
 import { Button, Col, Form, Row, Table } from "react-bootstrap";
 import { treatmentCodes } from "../../../utils/codes";
@@ -137,20 +137,24 @@ const ActualOdontogram: React.FC<ActualOdondogramProps> = ({ patientId }) => {
                     const selectedFaces = faces.split("");
                     selectedFaces.forEach((face) => {
                         if (["D", "V", "M", "L", "O"].includes(face.toUpperCase())) {
-                            currentTooth[face.toUpperCase() as keyof ToothType] = `${status}-${treatment}`;
+                            if(status === "EI") currentTooth[face.toUpperCase() as keyof ToothType] = `Realizado-${treatment}`;
+                            else currentTooth[face.toUpperCase() as keyof ToothType] = `${status}-${treatment}`;
                         } else {
                             throw new Error(`Se seleccionó una cara incorrecta`);
                         }
                     });
                 }
                 newTeethMap.set(toothNumber, currentTooth);
-                const newTreatments = [...prevOdontogram.treatments, {
-                    code: selectedCode,
-                    description: description,
-                    piece: selectedPiece,
-                    faces: selectedSides,
-                    status: selectedStatus,
-                }]
+                let newTreatments: treatment[] = [...prevOdontogram.treatments]
+                if (status != "EI") {
+                    newTreatments = [...prevOdontogram.treatments, {
+                        code: selectedCode,
+                        description: description,
+                        piece: selectedPiece,
+                        faces: selectedSides,
+                        status: selectedStatus,
+                    }]
+                }
                 setSelectedCode("")
                 setSelectedPiece(undefined)
                 setSelectedSides("")
@@ -191,10 +195,10 @@ const ActualOdontogram: React.FC<ActualOdondogramProps> = ({ patientId }) => {
     }
 
     const handleSave = async () => {
-        // if(!dirtyForm){
-        //     notifyError("No se ha hecho ninguna modificación")
-        //     return
-        // }
+        if(!dirtyForm){
+            notifyError("No se ha hecho ninguna modificación")
+            return
+        }
         try {
             const teethObject = Object.fromEntries(odontogram.teeth);
 
@@ -300,9 +304,6 @@ const ActualOdontogram: React.FC<ActualOdondogramProps> = ({ patientId }) => {
         if (patientId) getLastOdontogram()
     }, [])
 
-    console.log(patientId);
-
-
     return (
         <div className="">
             <div className="mb-3">
@@ -317,6 +318,7 @@ const ActualOdontogram: React.FC<ActualOdondogramProps> = ({ patientId }) => {
                                 value={selectedCode}
                                 onChange={handleSelect}
                                 placeholder="Ingrese el código"
+                                autoComplete="off"
                             />
                             <datalist id="treatmentCodes">
                                 {Object.keys(treatments).map((code) => (
@@ -365,6 +367,7 @@ const ActualOdontogram: React.FC<ActualOdondogramProps> = ({ patientId }) => {
                                 >
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="Realizado">Realizado</option>
+                                    <option value="EI">Estado inicial</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>

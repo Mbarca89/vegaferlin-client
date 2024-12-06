@@ -3,6 +3,7 @@ import { Nav } from "react-bootstrap"
 import { useRecoilState } from "recoil"
 import { alertModalState, formState } from "../../../app/store"
 import ActualOdontogram from "../../Odontogram/ActualOdontogram.tsx/ActualOdontogram"
+import OdontogramVersions from "../../Odontogram/OdontogramVersions/OdontogramVersions"
 import AlertModal from "../../Modal/AlertModal"
 
 interface PatientOdondogramProps {
@@ -39,7 +40,7 @@ const PatientOdontogram:React.FC<PatientOdondogramProps> = ({patientId}) => {
             </Nav>
             <div className="mt-3">
                 {currentTab === "actual" ? <ActualOdontogram patientId={patientId} /> : null}
-                {/* {currentTab === "versions" ? <CreatePatient updateList={setTab} /> : null} */}
+                {currentTab === "versions" ? <OdontogramVersions patientId={patientId} /> : null}
             </div>
             {showAlert && <AlertModal/>}
         </div>

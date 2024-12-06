@@ -347,3 +347,17 @@ export interface Odontogram {
     odontogramDate: string
 }
 
+export interface OdontogramVersion {
+    id: number
+    odontogramDate: string
+}
+
+export interface Appointment {
+    id: number
+    name: string
+    phone: string
+    title: string
+    start:string
+    end:string
+}
+

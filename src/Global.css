@@ -67,6 +67,20 @@
   text-decoration: none; /* Evitar subrayado */
 }
 
+.tui-full-calendar-allday-layout {
+  display: none !important;
+}
+
+/* Oculta la sección de Milestone */
+.tui-full-calendar-section-marker .tui-full-calendar-left-schedule {
+  display: none !important;
+}
+
+/* Oculta la sección de Task */
+.tui-full-calendar-task-layout {
+  display: none !important;
+}
+
 @media (max-width: 992px) {
   .h-sm-25 {
     height: 25%;

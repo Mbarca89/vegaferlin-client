@@ -66,6 +66,7 @@ const NavBar = () => {
                                 <NavDropdown.Item onClick={() => { handleNavigate("/users"); handleNavLinkClick() }}>Usuarios</NavDropdown.Item>
                             </NavDropdown>}
                             <Nav.Link onClick={() => { handleNavigate("/patients"); handleNavLinkClick() }}>Pacientes</Nav.Link>
+                            <Nav.Link onClick={() => { handleNavigate("/agenda"); handleNavLinkClick() }}>Agenda</Nav.Link>
                         </Nav>
                         <hr />
                         <Navbar.Text>
