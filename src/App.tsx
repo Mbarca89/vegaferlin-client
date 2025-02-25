@@ -14,6 +14,7 @@ import Users from "./views/Users/Users"
 import Patients from "./views/Patients/Patients"
 import PatienDetail from "./views/PatientDetail/PatientDetail"
 import Agenda from "./views/Agenda/Agenda"
+import Wa from "./views/Wa/Wa"
 
 const App = () => {
 
@@ -58,6 +59,7 @@ const App = () => {
           <Route path="/home" element={isLogged ? <Home /> : <Navigate to="/" />} />
           <Route path="/patients" element={isLogged ? <Patients /> : <Navigate to="/" />} />
           <Route path="/agenda" element={isLogged ? <Agenda /> : <Navigate to="/" />} />
+          <Route path="/whatsapp" element={isLogged ? <Wa /> : <Navigate to="/" />} />
           <Route path="/patient/:id/:tab" element={isLogged ? <PatienDetail /> : <Navigate to="/" />} />
           <Route path="/patient/:id/:tab/:protocolId" element={isLogged ? <PatienDetail /> : <Navigate to="/" />} />
           <Route path="/users" element={isLogged && user.role === "Administrador" ? <Users /> : <Navigate to="/" />} />

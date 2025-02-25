@@ -52,11 +52,14 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
         const selectedName = e.target.value;
         setSelectedPatient(selectedName);
         formik.setFieldValue('name', selectedName);
+
         if (patients[selectedName]) {
-            setPhone(patients[selectedName]);
-            formik.setFieldValue('phone', patients[selectedName]);
+            const patientPhone = patients[selectedName];
+            setPhone(patientPhone);
+            formik.setFieldValue('phone', patientPhone);
         } else {
             setPhone('');
+            formik.setFieldValue('phone', '');
         }
     };
 
@@ -88,6 +91,7 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
             title: "",
             start: start || "",
             end: end || "",
+            messageSent: false
         },
         validate,
         enableReinitialize: true,
@@ -95,7 +99,7 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
             setUploading(true)
             const createEvent = {
                 name: values.name,
-                phone: values.phone,
+                phone: "549" + values.phone,
                 title: values.title,
                 startDate: values.start,
                 endDate: values.end || values.start,
@@ -124,108 +128,114 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
     }, [])
 
     return (
-        loading ? 
-        <div></div> :
-         <div>
-            <Form onSubmit={formik.handleSubmit} noValidate>
-                <Row className='mb-2'>
-                    <Col xs={12} lg={6}>
-                        <label className='text-light' htmlFor="patient">Nombre</label>
-                        <input
-                            className={`form-control ${formik.touched.name && formik.errors.name ? 'is-invalid' : ''}`}
-                            list="patient-list"
-                            id="patient"
-                            name="name"
-                            value={formik.values.name}
-                            onChange={(e) => {
-                                formik.handleChange(e);
-                                handlePatientChange(e);
-                            }}
-                            onBlur={formik.handleBlur} 
-                            autoComplete='off'
-                        />
-                        {Object.keys(patients).length > 0 && (
-                            <datalist id="patient-list">
-                                {Object.keys(patients).map((fullName) => (
-                                    <option key={fullName} value={fullName} />
-                                ))}
-                            </datalist>
-                        )}
-                        <Form.Control.Feedback type="invalid">{formik.errors.name}</Form.Control.Feedback>
-                    </Col>
-                </Row>
-                <Row>
-                    <Form.Group as={Col} xs={12} lg={6}>
-                        <Form.Label className='text-light'>Teléfono</Form.Label>
-                        <Form.Control type="text" placeholder="Teléfono"
-                            id="phone"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            isInvalid={!!(formik.touched.phone && formik.errors.phone)}
-                        />
-                        <Form.Control.Feedback type="invalid">{formik.errors.phone}</Form.Control.Feedback>
-                    </Form.Group>
-                </Row>
-                <Row className="mb-2">
-                    <Form.Group as={Col} xs={12} lg={6}>
-                        <Form.Label className='text-light'>Título</Form.Label>
-                        <Form.Control type="text" placeholder="Título"
-                            id="title"
-                            name="title"
-                            value={formik.values.title}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            isInvalid={!!(formik.touched.title && formik.errors.title)}
-                        />
-                        <Form.Control.Feedback type="invalid">{formik.errors.title}</Form.Control.Feedback>
-                    </Form.Group>
-                </Row>
-                <Row className="mb-2">
-                    <Form.Group as={Col} xs={12} lg={6}>
-                        <Form.Label className='text-light'>Hora</Form.Label>
-                        <Form.Control type="datetime-local"
-                            id="start"
-                            name="start"
-                            value={formik.values.start}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            isInvalid={!!(formik.touched.start && formik.errors.start)}
-                        />
-                        <Form.Control.Feedback type="invalid">{formik.errors.start}</Form.Control.Feedback>
-                    </Form.Group>
-                </Row>
-                <Row className="mb-2">
-                    <Form.Group as={Col} xs={12} lg={6}>
-                        <Form.Label className='text-light'>Hasta</Form.Label>
-                        <Form.Control type="datetime-local"
-                            id="end"
-                            name="end"
-                            value={formik.values.end}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
-                    </Form.Group>
-                </Row>
-                <Row className='mb-3'>
-                    <Form.Group as={Col} className="d-flex justify-content-center mt-3">
-                        <div className='d-flex align-items-center justify-content-center w-25'>
-                            <Button className="" variant="danger" onClick={resetForm}>
-                                Cancelar
-                            </Button>
-                        </div>
-                        {!uploading ?
+        loading ?
+            <div></div> :
+            <div>
+                <Form onSubmit={formik.handleSubmit} noValidate>
+                    <Row className='mb-2'>
+                        <Col xs={12} lg={6}>
+                            <label className='text-light' htmlFor="patient">Nombre</label>
+                            <input
+                                className={`form-control ${formik.touched.name && formik.errors.name ? 'is-invalid' : ''}`}
+                                list="patient-list"
+                                id="patient"
+                                name="name"
+                                value={formik.values.name}
+                                onChange={(e) => {
+                                    formik.handleChange(e);
+                                    handlePatientChange(e);
+                                }}
+                                onBlur={formik.handleBlur}
+                                autoComplete='off'
+                            />
+                            {Object.keys(patients).length > 0 && (
+                                <datalist id="patient-list">
+                                    {Object.keys(patients).map((fullName) => (
+                                        <option key={fullName} value={fullName} />
+                                    ))}
+                                </datalist>
+                            )}
+                            <Form.Control.Feedback type="invalid">{formik.errors.name}</Form.Control.Feedback>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Form.Group as={Col} xs={12} lg={6}>
+                            <Form.Label className='text-light'>Teléfono (+549)</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Teléfono"
+                                id="phone"
+                                name="phone"
+                                value={formik.values.phone} // Usa Formik en lugar del estado separado
+                                onChange={(e) => {
+                                    setPhone(e.target.value);
+                                    formik.setFieldValue("phone", e.target.value);
+                                }}
+                                isInvalid={!!(formik.touched.phone && formik.errors.phone)}
+                            />
+                            <Form.Control.Feedback type="invalid">{formik.errors.phone}</Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                    <Row className="mb-2">
+                        <Form.Group as={Col} xs={12} lg={6}>
+                            <Form.Label className='text-light'>Título</Form.Label>
+                            <Form.Control type="text" placeholder="Título"
+                                id="title"
+                                name="title"
+                                value={formik.values.title}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                isInvalid={!!(formik.touched.title && formik.errors.title)}
+                            />
+                            <Form.Control.Feedback type="invalid">{formik.errors.title}</Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                    <Row className="mb-2">
+                        <Form.Group as={Col} xs={12} lg={6}>
+                            <Form.Label className='text-light'>Hora</Form.Label>
+                            <Form.Control type="datetime-local"
+                                id="start"
+                                name="start"
+                                value={formik.values.start}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                isInvalid={!!(formik.touched.start && formik.errors.start)}
+                            />
+                            <Form.Control.Feedback type="invalid">{formik.errors.start}</Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                    <Row className="mb-2">
+                        <Form.Group as={Col} xs={12} lg={6}>
+                            <Form.Label className='text-light'>Hasta</Form.Label>
+                            <Form.Control type="datetime-local"
+                                id="end"
+                                name="end"
+                                value={formik.values.end}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                        </Form.Group>
+                    </Row>
+                    <Row className='mb-3'>
+                        <Form.Group as={Col} className="d-flex justify-content-center mt-3">
                             <div className='d-flex align-items-center justify-content-center w-25'>
-                                <Button className="" variant="primary" type="submit">
-                                    Agendar
+                                <Button className="" variant="danger" onClick={resetForm}>
+                                    Cancelar
                                 </Button>
-                            </div> :
-                            <div className='d-flex align-items-center justify-content-center w-25'>
-                                <Spinner variant="light" />
-                            </div>}
-                    </Form.Group>
-                </Row>
-            </Form>
-        </div>
+                            </div>
+                            {!uploading ?
+                                <div className='d-flex align-items-center justify-content-center w-25'>
+                                    <Button className="" variant="primary" type="submit">
+                                        Agendar
+                                    </Button>
+                                </div> :
+                                <div className='d-flex align-items-center justify-content-center w-25'>
+                                    <Spinner variant="light" />
+                                </div>}
+                        </Form.Group>
+                    </Row>
+                </Form>
+            </div>
     )
 }
 

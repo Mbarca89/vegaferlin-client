@@ -359,5 +359,6 @@ export interface Appointment {
     title: string
     start:string
     end:string
+    messageSent: boolean
 }
 
