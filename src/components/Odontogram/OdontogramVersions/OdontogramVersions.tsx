@@ -87,6 +87,7 @@ const OdontogramVersions: React.FC<OdontogramVersionsProps> = ({ patientId }) =>
             const res = await axiosWithToken.get(`${SERVER_URL}/api/odontogram/getOdontograms?patientId=${patientId}`)
             if (res.data) {
                 setOdontogramVersions(res.data)
+                getSelectedVersion(res.data[0].id) // Load the first version by default
             }
         } catch (error) {
             handleError(error)

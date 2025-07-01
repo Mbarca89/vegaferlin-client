@@ -321,6 +321,20 @@ const PatientMedicalQuestionnaire: React.FC<PatientMedicalQuestionnaireProps> = 
             />
         </Form.Group>
     );
+    const renderNumberField = (id: keyof healthQuestionnaire, label: string) => (
+        <Form.Group>
+            <Form.Label className='text-light'>{label}</Form.Label>
+            <Form.Control
+                type="number"
+                id={id}
+                name={id}
+                value={formik.values[id] as string}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={!edit}
+            />
+        </Form.Group>
+    );
 
     const handleEdit = (allowed: boolean) => {
         if (!allowed) notifyError("Solo el profesional a cargo puede editar.")
@@ -382,7 +396,7 @@ const PatientMedicalQuestionnaire: React.FC<PatientMedicalQuestionnaireProps> = 
                             {renderTextField('medicalAttentionReason', 'Si lo estuviera ¿Por que motivo?')}
                             {renderTextField('medicInformation', 'Nombre y teléfono de su médico.')}
                             {renderBooleanField('majorSurgery', '¿Ha sufrido alguna operación de gravedad?')}
-                            {renderBooleanField('majorSurgeryReason', 'En caso afirmativo, explíquelo.')}
+                            {renderTextField('majorSurgeryReason', 'En caso afirmativo, explíquelo.')}
                             {renderBooleanField('hospitalized', '¿Ha sido hospitalizado o ha sufrido algun trastorno grave en los últimos 5 años?')}
                             {renderTextField('hospitalizedReason', 'En caso afirmativo, explíquelo.')}
                             <Form.Group>
@@ -451,7 +465,7 @@ const PatientMedicalQuestionnaire: React.FC<PatientMedicalQuestionnaireProps> = 
                             <p className="text-light">¿Tiene o ha tenido alguna vez...</p>
                             {renderBooleanField('heartAttacks', 'Ataques cardíacos, trombosis o embolias, insuficiencia coronaria, lesiones de válvulas cardíacas o cardiopatias congénitas?')}
                             {renderBooleanField('rheumatic', 'Cardiopatía reunmática o soplos al corazón?')}
-                            {renderBooleanField('chestPain', 'Dolor torácico trs un esfuerzo?')}
+                            {renderBooleanField('chestPain', 'Dolor torácico tras un esfuerzo?')}
                             {renderBooleanField('breath', 'Falta de aire tras un ejercicio leve?')}
                             {renderBooleanField('ankle', 'Hinchazón de tobillos?')}
                             <hr className="mt-3 mb-1" />
@@ -472,7 +486,7 @@ const PatientMedicalQuestionnaire: React.FC<PatientMedicalQuestionnaireProps> = 
                             <h3 className="text-light text-start mt-5">Sistema respiratorio</h3>
                             <hr />
                             {renderBooleanField('cough', '¿Padece resfriado o tos habitual?')}
-                            {renderBooleanField('tuberculosis', 'Tiene o ha tenido alguna vez tuberculosis?')}
+                            {renderBooleanField('tuberculosis', '¿Tiene o ha tenido alguna vez tuberculosis?')}
                             {renderBooleanField('familyTuberculosis', '¿Hay antecedentes de tuberculosis en su familia?')}
                             {renderBooleanField('sinusitis', '¿Tiene sinusitis o problemas sinusales?')}
                             {renderBooleanField('asma', '¿Tiene bronquitis crónica o asma?')}
@@ -532,7 +546,7 @@ const PatientMedicalQuestionnaire: React.FC<PatientMedicalQuestionnaireProps> = 
                             <hr />
                             {renderBooleanField('alcohol', '¿Bebe alcohol?')}
                             {renderBooleanField('smoker', '¿Fuma?')}
-                            {renderTextField('smokeTimes', '¿Cuantos cigarrillos al dia?')}
+                            {renderNumberField('smokeTimes', '¿Cuantos cigarrillos al dia?')}
                             {renderTextAreaField('habitsObservations', 'Observaciones')}
                             <h3 className="text-light text-start mt-5">Medicamentos</h3>
                             <hr />
