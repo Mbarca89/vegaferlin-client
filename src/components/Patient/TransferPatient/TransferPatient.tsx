@@ -83,8 +83,8 @@ const DeletePatient: React.FC<DeletePatientProps> = ({ patientId, patientName, i
         <div className="d-flex flex-column align-items-center text-light">
             {!confirm ?
                 <div>
-                    <span>¿Esta seguro que quiere transferir el paciente {patientName}?</span>
-                    <span>Profesional a cargo: {inChargeOf}</span>
+                    <p className="text-center">¿Esta seguro que quiere transferir el paciente {patientName}?</p>
+                    <p className="text-center">Profesional a cargo: {inChargeOf}</p>
                     <Form onSubmit={formik.handleSubmit} noValidate data-bs-theme="dark" className="mt-3">
                         <Row className="bg-dark-700 mb-3 rounded">
                             <h4 className="mb-5 text-light">Seleccione el nuevo profesional a cargo</h4>
