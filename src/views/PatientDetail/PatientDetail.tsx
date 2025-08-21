@@ -63,8 +63,8 @@ const PatienDetail = () => {
     })
     const [age, setAge] = useState<number>(0)
 
-    const handleTabChange = (tab:string) => {
-        if(dirtyForm) {
+    const handleTabChange = (tab: string) => {
+        if (dirtyForm) {
             setShowAlert(true)
         } else {
             navigate(`/patient/${id}/${tab}`)
@@ -85,6 +85,26 @@ const PatienDetail = () => {
                 (today.getMonth() === bornDate.getMonth() && today.getDate() < bornDate.getDate())) {
                 setAge(age - 1);
             }
+        } catch (error: any) {
+            handleError(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const downloadData = async () => {
+        try {
+            const res = await axiosWithToken.get(`${SERVER_URL}/api/pdf/patient/${id}`, {
+                responseType: "blob", // 👈 importante para manejar binarios
+            });
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `paciente_${id}.pdf`); // 👈 nombre del archivo
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
         } catch (error: any) {
             handleError(error)
         } finally {
@@ -150,6 +170,9 @@ const PatienDetail = () => {
                     <Nav.Item>
                         <Nav.Link className="custom-nav" eventKey="odontogram" onClick={() => handleTabChange("odontogram")}>Ficha odontológica</Nav.Link>
                     </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link className="custom-nav" onClick={downloadData}>Descargar Datos</Nav.Link>
+                    </Nav.Item>
                 </Nav>
                 <div className="mt-3 position-relative">
                     {currentTab === "PersonalInfo" ? <PatientPersonalInfo patientId={patient.id} inChargeOfId={patient.inChargeOfId} /> : null}
@@ -162,11 +185,11 @@ const PatienDetail = () => {
                     {currentTab === "gallery" ? <PatientGallery patientId={patient.id} inChargeOfId={patient.inChargeOfId} /> : null}
                     {currentTab === "workPlan" ? <PatientWotkPlan patientId={patient.id} inChargeOfId={patient.inChargeOfId} /> : null}
                     {currentTab === "surgicalProtocol" ? <PatientSurgicalProtocol patientId={patient.id} inChargeOfId={patient.inChargeOfId} /> : null}
-                    {currentTab === "surgicalProtocolDetail" ? <SurgicalProtocolDetail/> : null}
-                    {currentTab === "odontogram" ? <PatientOdontogram patientId={patient.id}/> : null}
+                    {currentTab === "surgicalProtocolDetail" ? <SurgicalProtocolDetail /> : null}
+                    {currentTab === "odontogram" ? <PatientOdontogram patientId={patient.id} /> : null}
                 </div>
             </div>
-            {showAlert && <AlertModal/>}
+            {showAlert && <AlertModal />}
         </div> :
             <Spinner />
     )

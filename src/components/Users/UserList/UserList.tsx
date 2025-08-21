@@ -7,6 +7,8 @@ import CustomModal from '../../Modal/CustomModal';
 // import DeleteUser from '../DeleteUser/DeleteUser';
 import { modalState } from "../../../app/store"
 import { useRecoilState } from "recoil"
+import EditUser from '../../EditUser/EditUser';
+import DeleteUser from '../../DeleteUser/DeleteUser';
 const SERVER_URL = import.meta.env.VITE_REACT_APP_SERVER_URL;
 
 const UserList = () => {
@@ -93,12 +95,12 @@ const UserList = () => {
                     )}
                     {show &&
                         editUser && <CustomModal title="Editar usuario">
-                            {/* <EditUser user={selectedUser} onUpdateUser={updateUsers} /> */}
+                            <EditUser user={selectedUser} onUpdateUser={updateUsers} />
                         </CustomModal>
                     }
                     {show &&
                         deleteUser && <CustomModal title="Eliminar usuario">
-                            {/* <DeleteUser user={selectedUser} onUpdateUser={updateUsers} /> */}
+                            <DeleteUser user={selectedUser} onUpdateUser={updateUsers} />
                         </CustomModal>
                     }
                 </tbody>

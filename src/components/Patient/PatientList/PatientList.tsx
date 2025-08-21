@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import handleError from '../../../utils/HandleErrors';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import DeletePatient from '../DetelePatient/DetelePatient';
+import TransferPatient from '../TransferPatient/TransferPatient';
 const SERVER_URL = import.meta.env.VITE_REACT_APP_SERVER_URL;
 
 const PatientList = () => {
@@ -30,6 +31,7 @@ const PatientList = () => {
     const [patients, setPatients] = useState<patientList[]>([]);
 
     const [show, setShow] = useRecoilState(modalState)
+    const [transferPatient, setTransferPatient] = useState<boolean>(false)
     const [deletePatient, setDeletePatient] = useState<boolean>(false)
 
     const getPatients = async () => {
@@ -53,6 +55,14 @@ const PatientList = () => {
     const handleDelete = (patient: patientList) => {
         setSelectedPatient(patient);
         setDeletePatient(true)
+        setTransferPatient(false)
+        setShow(!show);
+    };
+
+    const handleTransfer = (patient: patientList) => {
+        setSelectedPatient(patient);
+        setDeletePatient(false)
+        setTransferPatient(true)
         setShow(!show);
     };
 
@@ -81,20 +91,20 @@ const PatientList = () => {
         <div className='text-nowrap'>
             <h2 className="mb-5 text-light">Pacientes</h2>
             <Form onSubmit={handleSearch} className='mb-3'>
-                        <Row>
-                            <Col xs="auto">
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Buscar"
-                                    className=" mr-sm-2"
-                                    onChange={handleResetSearch}
-                                />
-                            </Col>
-                            <Col xs="auto">
-                                <Button type="submit">Buscar</Button>
-                            </Col>
-                        </Row>
-                    </Form>
+                <Row>
+                    <Col xs="auto">
+                        <Form.Control
+                            type="text"
+                            placeholder="Buscar"
+                            className=" mr-sm-2"
+                            onChange={handleResetSearch}
+                        />
+                    </Col>
+                    <Col xs="auto">
+                        <Button type="submit">Buscar</Button>
+                    </Col>
+                </Row>
+            </Form>
             {!loading ? <Table striped bordered hover size="sm" variant="dark">
                 <thead>
                     <tr>
@@ -105,6 +115,7 @@ const PatientList = () => {
                         <th>Teléfono</th>
                         <th>A cargo de</th>
                         <th>Eliminar</th>
+                        <th>Transferir</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -116,6 +127,7 @@ const PatientList = () => {
                         <td role='button' onClick={() => navigate(`/patient/${patient.id}/PersonalInfo`)}>{patient.phone}</td>
                         <td role='button' onClick={() => navigate(`/patient/${patient.id}/PersonalInfo`)}>{patient.inChargeOf}</td>
                         <td><svg onClick={() => handleDelete(patient)} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="0" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><g id="evaPersonDeleteOutline0"><g id="evaPersonDeleteOutline1"><path id="evaPersonDeleteOutline2" fill="currentColor" d="m20.47 7.5l.73-.73a1 1 0 0 0-1.47-1.47L19 6l-.73-.73a1 1 0 0 0-1.47 1.5l.73.73l-.73.73a1 1 0 0 0 1.47 1.47L19 9l.73.73a1 1 0 0 0 1.47-1.5ZM10 11a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0-6a2 2 0 1 1-2 2a2 2 0 0 1 2-2Zm0 8a7 7 0 0 0-7 7a1 1 0 0 0 2 0a5 5 0 0 1 10 0a1 1 0 0 0 2 0a7 7 0 0 0-7-7Z" /></g></g></g></svg></svg></td>
+                        <td><svg onClick={() => handleTransfer(patient)} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="0" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><g id="evaPersonDeleteOutline0"><g id="evaPersonDeleteOutline1"><path id="evaPersonDeleteOutline2" fill="currentColor" d="m20.47 7.5l.73-.73a1 1 0 0 0-1.47-1.47L19 6l-.73-.73a1 1 0 0 0-1.47 1.5l.73.73l-.73.73a1 1 0 0 0 1.47 1.47L19 9l.73.73a1 1 0 0 0 1.47-1.5ZM10 11a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0-6a2 2 0 1 1-2 2a2 2 0 0 1 2-2Zm0 8a7 7 0 0 0-7 7a1 1 0 0 0 2 0a5 5 0 0 1 10 0a1 1 0 0 0 2 0a7 7 0 0 0-7-7Z" /></g></g></g></svg></svg></td>
                     </tr>
                     )}
                     {show &&
@@ -123,9 +135,14 @@ const PatientList = () => {
                             <DeletePatient patientId={selectedPatient.id} patientName={selectedPatient.name} updateList={getPatients} />
                         </CustomModal>
                     }
+                    {show &&
+                        transferPatient && <CustomModal title="Transferir paciente">
+                            <TransferPatient patientId={selectedPatient.id} patientName={selectedPatient.name} inChargeOf={selectedPatient.inChargeOf} updateList={getPatients} />
+                        </CustomModal>
+                    }
                 </tbody>
             </Table> :
-            <Spinner/>}
+                <Spinner />}
         </div>
     )
 }
