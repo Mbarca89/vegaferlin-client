@@ -65,7 +65,7 @@ const Register: React.FC<RegisterProps> = ({updateList}) => {
             const createUser = {
                 name: values.name,
                 surname: values.surname,
-                userName: values.userName,
+                userName: values.userName.toLowerCase(),
                 password: encryptPassword(values.password),
                 role: values.role
             }

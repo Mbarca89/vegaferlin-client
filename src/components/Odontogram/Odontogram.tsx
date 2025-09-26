@@ -93,7 +93,7 @@ const OdontogramChart: React.FC<OdontogramChartProps> = ({ odontogram }) => {
         };
 
     return (
-        <div className="d-flex flex-row justify-content-around">
+        <div className="d-flex flex-row justify-content-around gap-2">
             <div className="d-flex flex-column align-items-end">
                 <div className="d-flex flex-row gap-1">
                     {Array.from(sortedOdontogram.left.top1.entries()).map(([key, value], index) => (

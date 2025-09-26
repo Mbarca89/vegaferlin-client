@@ -253,7 +253,7 @@ const PatientDentalPrediction: React.FC<PatientDentalPredictionProps> = ({ patie
                     <thead>
                         <tr>
                             <th>Pronóstico</th>
-                            {Array.from(dentalPrediction.top.keys()).map((piece) => (
+                            {Array.from(dentalPrediction.bottom.keys()).map((piece) => (
                                 <th>{piece}</th>
                             ))}
                         </tr>

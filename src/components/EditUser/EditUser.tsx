@@ -70,7 +70,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onUpdateUser }) => {
                 id: values.id,
                 name: values.name,
                 surname: values.surname,
-                userName: values.userName,
+                userName: values.userName.toLowerCase(),
                 password: encryptPassword(values.password),
                 role: values.role
             }
