@@ -1,6 +1,6 @@
-import { notifySuccess } from "../../Toaster/Toaster";
+import { notifyError, notifySuccess } from "../../Toaster/Toaster";
 import { axiosWithToken } from "../../../utils/axiosInstances";
-import { modalState } from "../../../app/store"
+import { modalState, userState } from "../../../app/store"
 import { useRecoilState } from "recoil"
 import Button from 'react-bootstrap/Button';
 import handleError from "../../../utils/HandleErrors";
@@ -10,17 +10,20 @@ import { userData } from "../../../types";
 import { useFormik } from "formik";
 const SERVER_URL = import.meta.env.VITE_REACT_APP_SERVER_URL;
 
-interface DeletePatientProps {
+
+interface TransferPatientProps {
     patientId: number
     patientName: string
     inChargeOf: string
     updateList: () => void;
 }
 
-const DeletePatient: React.FC<DeletePatientProps> = ({ patientId, patientName, inChargeOf, updateList }) => {
+const DeletePatient: React.FC<TransferPatientProps> = ({ patientId, patientName, inChargeOf, updateList }) => {
     const [loading, setloading] = useState<boolean>(false)
     const [show, setShow] = useRecoilState(modalState)
     const [confirm, setConfirm] = useState<boolean>(false)
+    const [user, setUser] = useRecoilState(userState)
+
 
     const [users, setUsers] = useState<userData[]>([{
         id: "",
@@ -58,6 +61,10 @@ const DeletePatient: React.FC<DeletePatientProps> = ({ patientId, patientName, i
         },
         validate,
         onSubmit: async values => {
+            if(inChargeOf != `${user.name} ${user.surname}`) {
+            notifyError("No puede transferir un paciente que no esta a su cargo. El paciente pertenece a " + inChargeOf)
+            return
+        }
             setConfirm(true)
         },
     });

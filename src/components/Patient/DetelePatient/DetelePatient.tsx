@@ -1,6 +1,6 @@
-import { notifySuccess } from "../../Toaster/Toaster";
+import { notifyError, notifySuccess } from "../../Toaster/Toaster";
 import { axiosWithToken } from "../../../utils/axiosInstances";
-import { modalState } from "../../../app/store"
+import { modalState, userState } from "../../../app/store"
 import { useRecoilState } from "recoil"
 import Button from 'react-bootstrap/Button';
 import handleError from "../../../utils/HandleErrors";
@@ -17,8 +17,14 @@ interface DeletePatientProps {
 const DeletePatient: React.FC<DeletePatientProps> = ({ patientId, patientName, updateList }) => {
     const [loading, setloading] = useState<boolean>(false)
     const [show, setShow] = useRecoilState(modalState)
+    const [user, setUser] = useRecoilState(userState)
 
     const handleDelete = async () => {
+        if(user.role !== "Administrador") {
+            notifyError("Solo un administrador puede eliminar pacientes")
+            setShow(false)
+            return
+        }
         setloading(true)
         try {
             const res = await axiosWithToken.delete(`${SERVER_URL}/api/patients/deleteById?id=${patientId}`)
