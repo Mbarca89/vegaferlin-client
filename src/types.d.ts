@@ -272,6 +272,7 @@ export interface SurgicalProtocol {
     jaw: boolean
     topMaxillaryInfo: SurgicalInfo
     jawInfo: SurgicalInfo
+    inChargeOfId: number
 }
 
 interface SurgicalInfo {

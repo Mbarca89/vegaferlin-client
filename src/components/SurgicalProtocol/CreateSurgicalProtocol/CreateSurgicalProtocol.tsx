@@ -90,7 +90,8 @@ const CreateSurgicalProtocol: React.FC<CreateSurgicalProtocolProps> = ({ patient
                 materials: [],
                 sutureMaterial: "",
                 technique: ""
-            }
+            },
+            inChargeOfId: 0
         },
         validate,
         onSubmit: async values => {

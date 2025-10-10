@@ -44,7 +44,7 @@ const PatientSurgicalProtocol: React.FC<PatientSurgicalProtocolProps> = ({ patie
         if (inChargeOfId == user.id) {
             setModal("create")
         } else {
-            notifyError("Solo el profesional a cargo puede iniciar un plan de trabajo")
+            notifyError("Solo el profesional a cargo puede iniciar un protoloco quirúrgico")
         }
     }
 
