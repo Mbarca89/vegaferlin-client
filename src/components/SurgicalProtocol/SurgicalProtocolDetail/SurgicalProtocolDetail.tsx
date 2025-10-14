@@ -128,7 +128,7 @@ const SurgicalProtocolDetail = () => {
     }
 
     const resetForm = () => {
-        formik.resetForm()
+        formik.resetForm({ values: formik.initialValues })
         setDirtyForm(false)
         setUploading(false)
         setEdit(false)
@@ -151,12 +151,14 @@ const SurgicalProtocolDetail = () => {
 
 
     const handleEditCompensator = (index: number, zone: string) => {
+        if (!edit) return
         zone === "top" ? setModal("editTopCompensator") : setModal("editJawCompensator")
         setCurrentIndex(index)
         setShow(true)
     }
 
     const handleDeleteCompensator = (index: number, zone: string) => {
+        if (!edit) return
         if (zone === "top") {
             const newCompensators = [...formik.values.topMaxillaryInfo.compensators];
             newCompensators.splice(index, 1);
@@ -169,12 +171,14 @@ const SurgicalProtocolDetail = () => {
     };
 
     const handleEditImplant = (index: number, zone: string) => {
+        if (!edit) return
         zone === "top" ? setModal("editTopImplant") : setModal("editJawImplant")
         setCurrentIndex(index)
         setShow(true)
     }
 
     const handleDeleteImplant = (index: number, zone: string) => {
+        if (!edit) return
         if (zone === "top") {
             const newImplants = [...formik.values.topMaxillaryInfo.implants];
             newImplants.splice(index, 1);
@@ -187,12 +191,14 @@ const SurgicalProtocolDetail = () => {
     };
 
     const handleEditMaterial = (index: number, zone: string) => {
+        if (!edit) return
         zone === "top" ? setModal("editTopMaterial") : setModal("editJawMaterial")
         setCurrentIndex(index)
         setShow(true)
     }
 
     const handleDeleteMaterial = (index: number, zone: string) => {
+        if (!edit) return
         if (zone === "top") {
             const newMaterials = [...formik.values.topMaxillaryInfo.materials];
             newMaterials.splice(index, 1);
@@ -230,7 +236,7 @@ const SurgicalProtocolDetail = () => {
                 id={`topMaxillaryInfo.${id}`}
                 name={`topMaxillaryInfo.${id}`}
                 value={formik.values.topMaxillaryInfo[id] as string}
-                disabled={!edit}
+                disabled={isSectionDisabled("top")}
                 onChange={(e) => {
                     setDirtyForm(true)
                     formik.handleChange(e)
@@ -245,7 +251,7 @@ const SurgicalProtocolDetail = () => {
                 id={`jawInfo.${id}`}
                 name={`jawInfo.${id}`}
                 value={formik.values.jawInfo && formik.values.jawInfo[id] as string}
-                disabled={!edit}
+                disabled={isSectionDisabled("jaw")}
                 onChange={(e) => {
                     setDirtyForm(true)
                     formik.handleChange(e)
@@ -253,6 +259,13 @@ const SurgicalProtocolDetail = () => {
             />
         </Form.Group>
     );
+
+    const isSectionDisabled = (section: "top" | "jaw") => {
+        if (section === "top") return !edit || !formik.values.topMaxillary
+        if (section === "jaw") return !edit || !formik.values.jaw
+        return true
+    }
+
     return (
         <div className="position-relative d-flex flex-column justify-content-center align-items-center">
             <div className="d-flex container position-fixed justify-content-end bottom-0 pe-4 pb-1 z-top">
@@ -342,13 +355,28 @@ const SurgicalProtocolDetail = () => {
                                         id="topMaxillary"
                                         checked={formik.values.topMaxillary}
                                         onChange={e => {
-                                            setDirtyForm(true)
-                                            const checked = e.target.checked
-                                            formik.setFieldValue("topMaxillary", checked)
+                                            setDirtyForm(true);
+                                            const checked = e.target.checked;
+                                            formik.setFieldValue("topMaxillary", checked);
                                             if (!checked) {
-                                                formik.setFieldValue("topMaxillaryInfo", formik.initialValues.topMaxillaryInfo)
-                                                formik.setFieldValue("topMaxillaryInfo.incisionFrom", "")
-                                                formik.setFieldValue("topMaxillaryInfo.incisionTo", "")
+                                                formik.setFieldValue("topMaxillaryInfo", {
+                                                    zone: "",
+                                                    anaesthesia: "",
+                                                    incisionFrom: 0,
+                                                    incisionTo: 0,
+                                                    disposition: "",
+                                                    extension: false,
+                                                    compensators: [],
+                                                    implants: [],
+                                                    regenerationObjective: "",
+                                                    elevationMethod: "",
+                                                    regenerationFrom: 0,
+                                                    regenerationTo: 0,
+                                                    membrane: false,
+                                                    materials: [],
+                                                    sutureMaterial: "",
+                                                    technique: ""
+                                                });
                                             }
                                         }}
                                         onBlur={formik.handleBlur}
@@ -364,7 +392,7 @@ const SurgicalProtocolDetail = () => {
                                                 id="topMaxillaryInfo.incisionFrom"
                                                 name="topMaxillaryInfo.incisionFrom"
                                                 value={formik.values.topMaxillaryInfo?.incisionFrom}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("top")}
                                             />
                                         </Form.Group>
                                         <Form.Group as={Col} xs={12} lg={6}>
@@ -373,72 +401,100 @@ const SurgicalProtocolDetail = () => {
                                                 id="topMaxillaryInfo.incisionTo"
                                                 name="topMaxillaryInfo.incisionTo"
                                                 value={formik.values.topMaxillaryInfo?.incisionTo}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("top")}
                                             />
                                         </Form.Group>
                                     </Row>
                                     <Row>
-                                        {renderTopInfoTextField('disposition', 'Disposición')}
+                                        <Form.Group as={Col} xs={12} lg={6}>
+                                            <Form.Label className="text-light">Disposición</Form.Label>
+                                            <Form.Select
+                                                id="topMaxillaryInfo.disposition"
+                                                name="topMaxillaryInfo.disposition"
+                                                value={formik.values.topMaxillaryInfo.disposition}
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                disabled={isSectionDisabled("top")}
+                                            >
+                                                <option value="">Seleccionar...</option>
+                                                <option value="Vestibularizada">Vestibularizada</option>
+                                                <option value="Palitinizada">Palitinizada</option>
+                                                <option value="Sobre reborde">Sobre reborde</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Row>
                                     <Row className="mb-3">
-                                        {renderTopInfoTextField('extension', 'Maniobras de extensión')}
+                                        <Form.Group as={Col} xs={12} lg={6}>
+                                            <Form.Label className='text-light'>Maniobras de extensión</Form.Label>
+                                            <Form.Select
+                                                id="topMaxillaryInfo.extension"
+                                                name="topMaxillaryInfo.extension"
+                                                value={formik.values.topMaxillaryInfo.extension ? "true" : "false"}
+                                                onChange={e => formik.setFieldValue("topMaxillaryInfo.extension", e.target.value === 'true')}
+                                                onBlur={formik.handleBlur}
+                                                disabled={isSectionDisabled("top")}
+                                            >
+                                                <option value="false">No</option>
+                                                <option value="true">Sí</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Row>
                                     <Accordion className="mb-3">
                                         <Accordion.Item eventKey={formik.values.topMaxillary ? "0" : ""}>
-                                        <Accordion.Header className={!formik.values.topMaxillary ? "pe-none" : "pe-auto"}>Compensadoras</Accordion.Header>
-                                        <Accordion.Body>
-                                            <p role="button" onClick={edit ? () => handleCompensator("top") : ()=>{return}}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
-                                            <hr />
-                                            {formik.values.topMaxillaryInfo.compensators?.map((compensator, index) => (
-                                                <div className="container border rounded">
-                                                    <div className="d-flex flex-row justify-content-between">
-                                                        <p><b>Compensadora {index + 1}</b></p>
-                                                        <div className="d-flex gap-2">
-                                                            <svg onClick={() => handleEditCompensator(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
-                                                            <svg onClick={() => handleDeleteCompensator(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                            <Accordion.Header className={!formik.values.topMaxillary ? "pe-none" : "pe-auto"}>Compensadoras</Accordion.Header>
+                                            <Accordion.Body>
+                                                <p role="button" onClick={edit ? () => handleCompensator("top") : () => { return }}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
+                                                <hr />
+                                                {formik.values.topMaxillaryInfo.compensators?.map((compensator, index) => (
+                                                    <div className="container border rounded">
+                                                        <div className="d-flex flex-row justify-content-between">
+                                                            <p><b>Compensadora {index + 1}</b></p>
+                                                            <div className="d-flex gap-2">
+                                                                <svg onClick={() => handleEditCompensator(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
+                                                                <svg onClick={() => handleDeleteCompensator(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                                            </div>
+                                                        </div>
+                                                        <div >
+                                                            <p><b>Ubicación:</b> {compensator.location}</p>
+                                                            <p><b>Localización:</b> {compensator.localization}</p>
                                                         </div>
                                                     </div>
-                                                    <div >
-                                                        <p><b>Ubicación:</b> {compensator.location}</p>
-                                                        <p><b>Localización:</b> {compensator.localization}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
                                     </Accordion>
                                     <Accordion className="">
                                         <Accordion.Item eventKey="0">
-                                        <Accordion.Header className={!formik.values.topMaxillary ? "pe-none" : "pe-auto"}>Implantes </Accordion.Header>
-                                        <Accordion.Body>
-                                            <p role="button" onClick={() => handleImplant("top")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
-                                            <hr />
-                                            {formik.values.topMaxillaryInfo.implants.map((implant, index) => (
-                                                <div className="container border rounded">
-                                                    <div className="d-flex flex-row justify-content-between">
-                                                        <p><b>Implante {index + 1}</b></p>
-                                                        <div className="d-flex gap-2">
-                                                            <svg onClick={() => handleEditImplant(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
-                                                            <svg onClick={() => handleDeleteImplant(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                            <Accordion.Header className={!formik.values.topMaxillary ? "pe-none" : "pe-auto"}>Implantes </Accordion.Header>
+                                            <Accordion.Body>
+                                                <p role="button" onClick={() => handleImplant("top")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
+                                                <hr />
+                                                {formik.values.topMaxillaryInfo.implants.map((implant, index) => (
+                                                    <div className="container border rounded">
+                                                        <div className="d-flex flex-row justify-content-between">
+                                                            <p><b>Implante {index + 1}</b></p>
+                                                            <div className="d-flex gap-2">
+                                                                <svg onClick={() => handleEditImplant(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
+                                                                <svg onClick={() => handleDeleteImplant(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                                            </div>
                                                         </div>
+                                                        <div >
+                                                            <p><b>Ubicación:</b> {implant.location}</p>
+                                                            <p><b>Marca y modelo:</b> {implant.brand}</p>
+                                                            <p><b>Conexión:</b> {implant.connection}</p>
+                                                            <p><b>Plataforma:</b> {implant.platform}</p>
+                                                            <p><b>Longitud:</b> {implant.length}</p>
+                                                            <p><b>Diametro del implante:</b> {implant.diameter}</p>
+                                                            <p><b>Torque de inserción:</b> {implant.torque}</p>
+                                                            <p><b>Estabilidad iniciál:</b> {implant.stability ? "Si" : "No"}</p>
+                                                            <p><b>Oportunidad de colocación:</b> {implant.placement}</p>
+                                                            <p><b>Método de maniobra instrumental:</b> {implant.instrumentalMethod}</p>
+                                                        </div>
+                                                        <hr />
                                                     </div>
-                                                    <div >
-                                                        <p><b>Ubicación:</b> {implant.location}</p>
-                                                        <p><b>Marca y modelo:</b> {implant.brand}</p>
-                                                        <p><b>Conexión:</b> {implant.connection}</p>
-                                                        <p><b>Plataforma:</b> {implant.platform}</p>
-                                                        <p><b>Longitud:</b> {implant.length}</p>
-                                                        <p><b>Diametro del implante:</b> {implant.diameter}</p>
-                                                        <p><b>Torque de inserción:</b> {implant.torque}</p>
-                                                        <p><b>Estabilidad iniciál:</b> {implant.stability ? "Si" : "No"}</p>
-                                                        <p><b>Oportunidad de colocación:</b> {implant.placement}</p>
-                                                        <p><b>Método de maniobra instrumental:</b> {implant.instrumentalMethod}</p>
-                                                    </div>
-                                                    <hr />
-                                                </div>
-                                            ))}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
                                     </Accordion>
                                     <Row>
                                         {renderTopInfoTextField('regenerationObjective', 'Objetivo de regeneración ósea')}
@@ -454,7 +510,7 @@ const SurgicalProtocolDetail = () => {
                                                 id="topMaxillaryInfo.regenerationFrom"
                                                 name="topMaxillaryInfo.regenerationFrom"
                                                 value={formik.values.topMaxillaryInfo?.regenerationFrom}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("top")}
                                             />
                                         </Form.Group>
                                         <Form.Group as={Col} xs={12} lg={6}>
@@ -463,37 +519,50 @@ const SurgicalProtocolDetail = () => {
                                                 id="topMaxillaryInfo.regenerationTo"
                                                 name="topMaxillaryInfo.regenerationTo"
                                                 value={formik.values.topMaxillaryInfo?.regenerationTo}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("top")}
                                             />
                                         </Form.Group>
                                     </Row>
                                     <Row className="mb-3">
-                                        {renderTopInfoTextField('membrane', 'Colocación de membrana')}
+                                        <Form.Group as={Col} xs={12} lg={6}>
+                                            <Form.Label className='text-light'>Colocación de membrana</Form.Label>
+                                            <Form.Select
+                                                id="topMaxillaryInfo.membrane"
+                                                name="topMaxillaryInfo.membrane"
+                                                value={formik.values.topMaxillaryInfo.membrane ? "true" : "false"}
+                                                onChange={e => formik.setFieldValue("topMaxillaryInfo.membrane", e.target.value === 'true')}
+                                                onBlur={formik.handleBlur}
+                                                disabled={isSectionDisabled("top")}
+                                            >
+                                                <option value="false">No</option>
+                                                <option value="true">Sí</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Row>
                                     <Accordion className="mb-3">
                                         <Accordion.Item eventKey={formik.values.topMaxillary ? "0" : ""}>
-                                        <Accordion.Header className={!formik.values.topMaxillary ? "pe-none" : "pe-auto"}>Materiales de regeneración</Accordion.Header>
-                                        <Accordion.Body>
-                                            <p role="button" onClick={() => handleMaterial("top")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
-                                            <hr />
-                                            {formik.values.topMaxillaryInfo.materials?.map((material, index) => (
-                                                <div className="container border rounded">
-                                                    <div className="d-flex flex-row justify-content-between">
-                                                        <p><b>Material {index + 1}</b></p>
-                                                        <div className="d-flex gap-2">
-                                                            <svg onClick={() => handleEditMaterial(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
-                                                            <svg onClick={() => handleDeleteMaterial(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                            <Accordion.Header className={!formik.values.topMaxillary ? "pe-none" : "pe-auto"}>Materiales de regeneración</Accordion.Header>
+                                            <Accordion.Body>
+                                                <p role="button" onClick={() => handleMaterial("top")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
+                                                <hr />
+                                                {formik.values.topMaxillaryInfo.materials?.map((material, index) => (
+                                                    <div className="container border rounded">
+                                                        <div className="d-flex flex-row justify-content-between">
+                                                            <p><b>Material {index + 1}</b></p>
+                                                            <div className="d-flex gap-2">
+                                                                <svg onClick={() => handleEditMaterial(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
+                                                                <svg onClick={() => handleDeleteMaterial(index, "top")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                                            </div>
                                                         </div>
+                                                        <div>
+                                                            <p><b>Injerto:</b> {material.grafting}</p>
+                                                            <p><b>Zona dadora de autólogo:</b> {material.autologue}</p>
+                                                        </div>
+                                                        <hr />
                                                     </div>
-                                                    <div>
-                                                        <p><b>Injerto:</b> {material.grafting}</p>
-                                                        <p><b>Zona dadora de autólogo:</b> {material.autologue}</p>
-                                                    </div>
-                                                    <hr />
-                                                </div>
-                                            ))}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
                                     </Accordion>
                                     <Row >
                                         {renderTopInfoTextField('sutureMaterial', 'Material de sutura')}
@@ -513,16 +582,32 @@ const SurgicalProtocolDetail = () => {
                                 <Accordion.Body>
                                     <Form.Check
                                         type="switch"
-                                        id="topMaxillary"
-                                        checked={formik.values.topMaxillary}
+                                        id="jaw"
+                                        checked={formik.values.jaw}
                                         onChange={e => {
-                                            setDirtyForm(true)
-                                            const checked = e.target.checked
-                                            formik.setFieldValue("topMaxillary", checked)
+                                            setDirtyForm(true);
+                                            const checked = e.target.checked;
+                                            formik.setFieldValue("jaw", checked);
+
                                             if (!checked) {
-                                                formik.setFieldValue("topMaxillaryInfo", formik.initialValues.topMaxillaryInfo)
-                                                formik.setFieldValue("topMaxillaryInfo.incisionFrom", "")
-                                                formik.setFieldValue("topMaxillaryInfo.incisionTo", "")
+                                                formik.setFieldValue("jawInfo", {
+                                                    zone: "",
+                                                    anaesthesia: "",
+                                                    incisionFrom: 0,
+                                                    incisionTo: 0,
+                                                    disposition: "",
+                                                    extension: false,
+                                                    compensators: [],
+                                                    implants: [],
+                                                    regenerationObjective: "",
+                                                    elevationMethod: "",
+                                                    regenerationFrom: 0,
+                                                    regenerationTo: 0,
+                                                    membrane: false,
+                                                    materials: [],
+                                                    sutureMaterial: "",
+                                                    technique: ""
+                                                });
                                             }
                                         }}
                                         onBlur={formik.handleBlur}
@@ -542,7 +627,7 @@ const SurgicalProtocolDetail = () => {
                                                     setDirtyForm(true)
                                                     formik.handleChange(e)
                                                 }}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("jaw")}
                                             />
                                         </Form.Group>
                                         <Form.Group as={Col} xs={12} lg={6}>
@@ -555,72 +640,100 @@ const SurgicalProtocolDetail = () => {
                                                     setDirtyForm(true)
                                                     formik.handleChange(e)
                                                 }}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("jaw")}
                                             />
                                         </Form.Group>
                                     </Row>
                                     <Row>
-                                        {renderJawInfoTextField('disposition', 'Disposición')}
+                                        <Form.Group as={Col} xs={12} lg={6}>
+                                            <Form.Label className="text-light">Disposición</Form.Label>
+                                            <Form.Select
+                                                id="jawInfo.disposition"
+                                                name="jawInfo.disposition"
+                                                value={formik.values.jawInfo.disposition}
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                disabled={isSectionDisabled("jaw")}
+                                            >
+                                                <option value="">Seleccionar...</option>
+                                                <option value="Lingualizada">Lingualizada</option>
+                                                <option value="Vestibularizada">Vestibularizada</option>
+                                                <option value="Sobre reborde">Sobre reborde</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Row>
                                     <Row className="mb-3">
-                                        {renderJawInfoTextField('extension', 'Maniobras de extensión')}
+                                        <Form.Group as={Col} xs={12} lg={6}>
+                                            <Form.Label className='text-light'>Maniobras de extensión</Form.Label>
+                                            <Form.Select
+                                                id="jawInfo.extension"
+                                                name="jawInfo.extension"
+                                                value={formik.values.jawInfo.extension ? "true" : "false"}
+                                                onChange={e => formik.setFieldValue("jawInfo.extension", e.target.value === 'true')}
+                                                onBlur={formik.handleBlur}
+                                                disabled={isSectionDisabled("jaw")}
+                                            >
+                                                <option value="false">No</option>
+                                                <option value="true">Sí</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Row>
                                     <Accordion className="mb-3">
                                         <Accordion.Item eventKey={formik.values.jaw ? "0" : ""}>
-                                        <Accordion.Header className={!formik.values.jaw ? "pe-none" : "pe-auto"}>Compensadoras</Accordion.Header>
-                                        <Accordion.Body>
-                                            <p role="button" onClick={() => handleCompensator("jaw")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
-                                            <hr />
-                                            {formik.values.jawInfo.compensators?.map((compensator, index) => (
-                                                <div className="container border rounded">
-                                                    <div className="d-flex flex-row justify-content-between">
-                                                        <p><b>Compensadora {index + 1}</b></p>
-                                                        <div className="d-flex gap-2">
-                                                            <svg onClick={() => handleEditCompensator(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
-                                                            <svg onClick={() => handleDeleteCompensator(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                            <Accordion.Header className={!formik.values.jaw ? "pe-none" : "pe-auto"}>Compensadoras</Accordion.Header>
+                                            <Accordion.Body>
+                                                <p role="button" onClick={() => handleCompensator("jaw")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
+                                                <hr />
+                                                {formik.values.jawInfo.compensators?.map((compensator, index) => (
+                                                    <div className="container border rounded">
+                                                        <div className="d-flex flex-row justify-content-between">
+                                                            <p><b>Compensadora {index + 1}</b></p>
+                                                            <div className="d-flex gap-2">
+                                                                <svg onClick={() => handleEditCompensator(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
+                                                                <svg onClick={() => handleDeleteCompensator(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                                            </div>
+                                                        </div>
+                                                        <div >
+                                                            <p><b>Ubicación:</b> {compensator.location}</p>
+                                                            <p><b>Localización:</b> {compensator.localization}</p>
                                                         </div>
                                                     </div>
-                                                    <div >
-                                                        <p><b>Ubicación:</b> {compensator.location}</p>
-                                                        <p><b>Localización:</b> {compensator.localization}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
                                     </Accordion>
                                     <Accordion className="">
                                         <Accordion.Item eventKey="0">
-                                        <Accordion.Header className={!formik.values.jaw ? "pe-none" : "pe-auto"}>Implantes </Accordion.Header>
-                                        <Accordion.Body>
-                                            <p role="button" onClick={() => handleImplant("jaw")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
-                                            <hr />
-                                            {formik.values.jawInfo.implants.map((implant, index) => (
-                                                <div className="container border rounded">
-                                                    <div className="d-flex flex-row justify-content-between">
-                                                        <p><b>Implante {index + 1}</b></p>
-                                                        <div className="d-flex gap-2">
-                                                            <svg onClick={() => handleEditImplant(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
-                                                            <svg onClick={() => handleDeleteImplant(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                            <Accordion.Header className={!formik.values.jaw ? "pe-none" : "pe-auto"}>Implantes </Accordion.Header>
+                                            <Accordion.Body>
+                                                <p role="button" onClick={() => handleImplant("jaw")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
+                                                <hr />
+                                                {formik.values.jawInfo.implants.map((implant, index) => (
+                                                    <div className="container border rounded">
+                                                        <div className="d-flex flex-row justify-content-between">
+                                                            <p><b>Implante {index + 1}</b></p>
+                                                            <div className="d-flex gap-2">
+                                                                <svg onClick={() => handleEditImplant(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
+                                                                <svg onClick={() => handleDeleteImplant(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                                            </div>
                                                         </div>
+                                                        <div >
+                                                            <p><b>Ubicación:</b> {implant.location}</p>
+                                                            <p><b>Marca y modelo:</b> {implant.brand}</p>
+                                                            <p><b>Conexión:</b> {implant.connection}</p>
+                                                            <p><b>Plataforma:</b> {implant.platform}</p>
+                                                            <p><b>Longitud:</b> {implant.length}</p>
+                                                            <p><b>Diametro del implante:</b> {implant.diameter}</p>
+                                                            <p><b>Torque de inserción:</b> {implant.torque}</p>
+                                                            <p><b>Estabilidad iniciál:</b> {implant.stability ? "Si" : "No"}</p>
+                                                            <p><b>Oportunidad de colocación:</b> {implant.placement}</p>
+                                                            <p><b>Método de maniobra instrumental:</b> {implant.instrumentalMethod}</p>
+                                                        </div>
+                                                        <hr />
                                                     </div>
-                                                    <div >
-                                                        <p><b>Ubicación:</b> {implant.location}</p>
-                                                        <p><b>Marca y modelo:</b> {implant.brand}</p>
-                                                        <p><b>Conexión:</b> {implant.connection}</p>
-                                                        <p><b>Plataforma:</b> {implant.platform}</p>
-                                                        <p><b>Longitud:</b> {implant.length}</p>
-                                                        <p><b>Diametro del implante:</b> {implant.diameter}</p>
-                                                        <p><b>Torque de inserción:</b> {implant.torque}</p>
-                                                        <p><b>Estabilidad iniciál:</b> {implant.stability ? "Si" : "No"}</p>
-                                                        <p><b>Oportunidad de colocación:</b> {implant.placement}</p>
-                                                        <p><b>Método de maniobra instrumental:</b> {implant.instrumentalMethod}</p>
-                                                    </div>
-                                                    <hr />
-                                                </div>
-                                            ))}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
                                     </Accordion>
                                     <Row>
                                         {renderJawInfoTextField('regenerationObjective', 'Objetivo de regeneración ósea')}
@@ -640,7 +753,7 @@ const SurgicalProtocolDetail = () => {
                                                     setDirtyForm(true)
                                                     formik.handleChange(e)
                                                 }}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("jaw")}
                                             />
                                         </Form.Group>
                                         <Form.Group as={Col} xs={12} lg={6}>
@@ -653,37 +766,50 @@ const SurgicalProtocolDetail = () => {
                                                     setDirtyForm(true)
                                                     formik.handleChange(e)
                                                 }}
-                                                disabled={!edit}
+                                                disabled={isSectionDisabled("jaw")}
                                             />
                                         </Form.Group>
                                     </Row>
                                     <Row className="mb-3">
-                                        {renderJawInfoTextField('membrane', 'Colocación de membrana')}
+                                        <Form.Group as={Col} xs={12} lg={6}>
+                                            <Form.Label className='text-light'>Colocación de membrana</Form.Label>
+                                            <Form.Select
+                                                id="jawInfo.membrane"
+                                                name="jawInfo.membrane"
+                                                value={formik.values.jawInfo.membrane ? "true" : "false"}
+                                                onChange={e => formik.setFieldValue("jawInfo.membrane", e.target.value === 'true')}
+                                                onBlur={formik.handleBlur}
+                                                disabled={isSectionDisabled("jaw")}
+                                            >
+                                                <option value="false">No</option>
+                                                <option value="true">Sí</option>
+                                            </Form.Select>
+                                        </Form.Group>
                                     </Row>
                                     <Accordion className="mb-3">
-                                       <Accordion.Item eventKey={formik.values.jaw ? "0" : ""}>
-                                        <Accordion.Header className={!formik.values.jaw ? "pe-none" : "pe-auto"}>Materiales de regeneración</Accordion.Header>
-                                        <Accordion.Body>
-                                            <p role="button" onClick={() => handleMaterial("jaw")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
-                                            <hr />
-                                            {formik.values.jawInfo.materials?.map((material, index) => (
-                                                <div className="container border rounded">
-                                                    <div className="d-flex flex-row justify-content-between">
-                                                        <p><b>Material {index + 1}</b></p>
-                                                        <div className="d-flex gap-2">
-                                                            <svg onClick={() => handleEditMaterial(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
-                                                            <svg onClick={() => handleDeleteMaterial(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={{ color: "#ffffff" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                        <Accordion.Item eventKey={formik.values.jaw ? "0" : ""}>
+                                            <Accordion.Header className={!formik.values.jaw ? "pe-none" : "pe-auto"}>Materiales de regeneración</Accordion.Header>
+                                            <Accordion.Body>
+                                                <p role="button" onClick={() => handleMaterial("jaw")}>Agregar <svg width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" role="img" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 20v-8m0 0V4m0 8h8m-8 0H4" /></g></svg></svg></p>
+                                                <hr />
+                                                {formik.values.jawInfo.materials?.map((material, index) => (
+                                                    <div className="container border rounded">
+                                                        <div className="d-flex flex-row justify-content-between">
+                                                            <p><b>Material {index + 1}</b></p>
+                                                            <div className="d-flex gap-2">
+                                                                <svg onClick={() => handleEditMaterial(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full cursor-pointer"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 1024 1024" fill="#D040EE" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#D040EE"><path fill="currentColor" d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3l-362.7 362.6l-88.9 15.7l15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z" /></g></svg></svg>
+                                                                <svg onClick={() => handleDeleteMaterial(index, "jaw")} role="button" width="25" height="25" viewBox="0 0 512 512" style={edit ? { color: "#ffffff" } : { color: "#444444" }} xmlns="http://www.w3.org/2000/svg" className="h-full w-full"><rect width="512" height="512" x="0" y="0" rx="30" fill="transparent" stroke="transparent" strokeWidth="0" strokeOpacity="100%" paintOrder="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 24 24" fill="#632f6b" x="0" y="0" style={{ display: "inline-block;vertical-align:middle" }} xmlns="http://www.w3.org/2000/svg"><g fill="#632f6b"><path fill="currentColor" d="M14.12 10.47L12 12.59l-2.13-2.12l-1.41 1.41L10.59 14l-2.12 2.12l1.41 1.41L12 15.41l2.12 2.12l1.41-1.41L13.41 14l2.12-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z" /></g></svg></svg>
+                                                            </div>
                                                         </div>
+                                                        <div>
+                                                            <p><b>Injerto:</b> {material.grafting}</p>
+                                                            <p><b>Zona dadora de autólogo:</b> {material.autologue}</p>
+                                                        </div>
+                                                        <hr />
                                                     </div>
-                                                    <div>
-                                                        <p><b>Injerto:</b> {material.grafting}</p>
-                                                        <p><b>Zona dadora de autólogo:</b> {material.autologue}</p>
-                                                    </div>
-                                                    <hr />
-                                                </div>
-                                            ))}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
                                     </Accordion>
                                     <Row >
                                         {renderJawInfoTextField('sutureMaterial', 'Material de sutura')}
@@ -698,78 +824,78 @@ const SurgicalProtocolDetail = () => {
                 </Form>
             </div> :
                 <Spinner></Spinner>}
-                 {
-                                show && modal === "topCompensator" &&
-                                <CustomModal title="Agregar compensadora">
-                                    <AddCompensator compensators={formik.values.topMaxillaryInfo.compensators}></AddCompensator>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "editTopCompensator" &&
-                                <CustomModal title="Editar compensadora">
-                                    <EditCompensator compensators={formik.values.topMaxillaryInfo.compensators} index={currentIndex}></EditCompensator>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "topImplant" &&
-                                <CustomModal title="Agregar implante">
-                                    <Addimplant implants={formik.values.topMaxillaryInfo.implants}></Addimplant>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "topMaterial" &&
-                                <CustomModal title="Agregar materiales">
-                                    <AddMaterial materials={formik.values.topMaxillaryInfo.materials}></AddMaterial>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "editTopMaterial" &&
-                                <CustomModal title="Editar material">
-                                    <EditMaterial materials={formik.values.topMaxillaryInfo.materials} index={currentIndex}></EditMaterial>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "editTopImplant" &&
-                                <CustomModal title="Editar implante">
-                                    <EditImplant implants={formik.values.topMaxillaryInfo.implants} index={currentIndex}></EditImplant>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "jawCompensator" &&
-                                <CustomModal title="Agregar compensadora">
-                                    <AddCompensator compensators={formik.values.jawInfo.compensators}></AddCompensator>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "editJawCompensator" &&
-                                <CustomModal title="Editar compensadora">
-                                    <EditCompensator compensators={formik.values.jawInfo.compensators} index={currentIndex}></EditCompensator>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "jawImplant" &&
-                                <CustomModal title="Agregar implante">
-                                    <Addimplant implants={formik.values.jawInfo.implants}></Addimplant>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "editJawImplant" &&
-                                <CustomModal title="Editar implante">
-                                    <EditImplant implants={formik.values.jawInfo.implants} index={currentIndex}></EditImplant>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "jawMaterial" &&
-                                <CustomModal title="Agregar materiales">
-                                    <AddMaterial materials={formik.values.jawInfo.materials}></AddMaterial>
-                                </CustomModal>
-                            }
-                            {
-                                show && modal === "editJawMaterial" &&
-                                <CustomModal title="Editar material">
-                                    <EditMaterial materials={formik.values.jawInfo.materials} index={currentIndex}></EditMaterial>
-                                </CustomModal>
-                            }
+            {
+                show && modal === "topCompensator" &&
+                <CustomModal title="Agregar compensadora">
+                    <AddCompensator compensators={formik.values.topMaxillaryInfo.compensators}></AddCompensator>
+                </CustomModal>
+            }
+            {
+                show && modal === "editTopCompensator" &&
+                <CustomModal title="Editar compensadora">
+                    <EditCompensator compensators={formik.values.topMaxillaryInfo.compensators} index={currentIndex}></EditCompensator>
+                </CustomModal>
+            }
+            {
+                show && modal === "topImplant" &&
+                <CustomModal title="Agregar implante">
+                    <Addimplant implants={formik.values.topMaxillaryInfo.implants}></Addimplant>
+                </CustomModal>
+            }
+            {
+                show && modal === "topMaterial" &&
+                <CustomModal title="Agregar materiales">
+                    <AddMaterial materials={formik.values.topMaxillaryInfo.materials}></AddMaterial>
+                </CustomModal>
+            }
+            {
+                show && modal === "editTopMaterial" &&
+                <CustomModal title="Editar material">
+                    <EditMaterial materials={formik.values.topMaxillaryInfo.materials} index={currentIndex}></EditMaterial>
+                </CustomModal>
+            }
+            {
+                show && modal === "editTopImplant" &&
+                <CustomModal title="Editar implante">
+                    <EditImplant implants={formik.values.topMaxillaryInfo.implants} index={currentIndex}></EditImplant>
+                </CustomModal>
+            }
+            {
+                show && modal === "jawCompensator" &&
+                <CustomModal title="Agregar compensadora">
+                    <AddCompensator compensators={formik.values.jawInfo.compensators}></AddCompensator>
+                </CustomModal>
+            }
+            {
+                show && modal === "editJawCompensator" &&
+                <CustomModal title="Editar compensadora">
+                    <EditCompensator compensators={formik.values.jawInfo.compensators} index={currentIndex}></EditCompensator>
+                </CustomModal>
+            }
+            {
+                show && modal === "jawImplant" &&
+                <CustomModal title="Agregar implante">
+                    <Addimplant implants={formik.values.jawInfo.implants}></Addimplant>
+                </CustomModal>
+            }
+            {
+                show && modal === "editJawImplant" &&
+                <CustomModal title="Editar implante">
+                    <EditImplant implants={formik.values.jawInfo.implants} index={currentIndex}></EditImplant>
+                </CustomModal>
+            }
+            {
+                show && modal === "jawMaterial" &&
+                <CustomModal title="Agregar materiales">
+                    <AddMaterial materials={formik.values.jawInfo.materials}></AddMaterial>
+                </CustomModal>
+            }
+            {
+                show && modal === "editJawMaterial" &&
+                <CustomModal title="Editar material">
+                    <EditMaterial materials={formik.values.jawInfo.materials} index={currentIndex}></EditMaterial>
+                </CustomModal>
+            }
         </div>
     )
 }
