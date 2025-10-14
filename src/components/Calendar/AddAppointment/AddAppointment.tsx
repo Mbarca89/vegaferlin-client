@@ -80,6 +80,27 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
         if (!values.name.trim()) {
             errors.name = 'Ingrese el nombre del paciente';
         }
+        if (!values.start) {
+            errors.start = 'Ingrese la hora de inicio';
+        } else {
+            const startDate = new Date(values.start);
+            if (isNaN(startDate.getTime())) {
+                errors.start = 'Formato de hora inválido';
+            }
+        }
+
+        if (!values.end) {
+            errors.end = 'Ingrese la hora de fin';
+        } else {
+            const startDate = new Date(values.start);
+            const endDate = new Date(values.end);
+
+            if (isNaN(endDate.getTime())) {
+                errors.end = 'Formato de hora inválido';
+            } else if (endDate <= startDate) {
+                errors.end = 'La hora de fin debe ser posterior al inicio';
+            }
+        }
         return errors;
     };
 
@@ -166,7 +187,7 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
                                 placeholder="Teléfono"
                                 id="phone"
                                 name="phone"
-                                value={formik.values.phone} // Usa Formik en lugar del estado separado
+                                value={formik.values.phone}
                                 onChange={(e) => {
                                     setPhone(e.target.value);
                                     formik.setFieldValue("phone", e.target.value);
@@ -213,7 +234,9 @@ const AddAppointment: React.FC<AddAppointmentProps> = ({ start, end, updateEvent
                                 value={formik.values.end}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
+                                 isInvalid={!!(formik.touched.end && formik.errors.end)}
                             />
+                            <Form.Control.Feedback type="invalid">{formik.errors.end}</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
                     <Row className='mb-3'>

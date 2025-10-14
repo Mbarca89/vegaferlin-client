@@ -8,7 +8,7 @@ import AddAppointment from '../../components/Calendar/AddAppointment/AddAppointm
 import CustomModal from '../../components/Modal/CustomModal';
 import { modalState } from '../../app/store';
 import { useRecoilState } from "recoil"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { axiosWithToken } from '../../utils/axiosInstances';
 import handleError from '../../utils/HandleErrors';
 import { Appointment } from '../../types';
@@ -25,9 +25,11 @@ const Agenda = () => {
     const [appointments, setAppointments] = useState([]);
     const [lastDateRange, setLastDateRange] = useState({ start: null, end: null });
     const [selectedEvent, setSelectedEvent] = useState<number>(0);
-
     const [viewMode, setViewMode] = useState<"calendar" | "table">("calendar");
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0]);
+    const [activeDate, setActiveDate] = useState(new Date());
+    const lastActiveDateRef = useRef<Date | null>(null);
+
 
     const today = new Date();
     today.setHours(0, 0, 0);
@@ -57,11 +59,33 @@ const Agenda = () => {
         const startDate = info.start.toISOString();
         const endDate = info.end.toISOString();
 
+        const viewType = info.view.type;
+        let newActiveDate: Date;
+
+        if (viewType === "timeGridDay") {
+            newActiveDate = info.start;
+        } else {
+            const today = new Date();
+            if (today >= info.start && today < info.end) {
+                newActiveDate = today;
+            } else {
+                newActiveDate = info.start;
+            }
+        }
+        if (
+            !lastActiveDateRef.current ||
+            lastActiveDateRef.current.toDateString() !== newActiveDate.toDateString()
+        ) {
+            lastActiveDateRef.current = newActiveDate;
+            setActiveDate(newActiveDate);
+        }
+
         if (startDate !== lastDateRange.start || endDate !== lastDateRange.end) {
             setLastDateRange({ start: startDate, end: endDate });
             getEvents(startDate, endDate);
         }
     };
+
 
     const handleDateSelection = (selectionInfo: any) => {
         setModal("add");
@@ -95,11 +119,6 @@ const Agenda = () => {
         setShow(true);
     };
 
-    const handleDateClick = (info: any) => {
-        setSelectedDate(info.dateStr);
-        setViewMode("table");
-    };
-
     return (
         <div className="container flex-grow-1 p-lg-3 p-sm-0 rounded bg-dark-800 m-2 overflow-auto" style={{ minHeight: "85vh" }}>
             {/* 🔹 Toolbar */}
@@ -111,7 +130,7 @@ const Agenda = () => {
                     onClick={() => {
                         setModal("add");
                         setShow(true);
-                        setSelectedStart(new Date().toISOString());
+                        setSelectedStart("");
                         setSelectedEnd("");
                     }}
                 >
@@ -130,7 +149,7 @@ const Agenda = () => {
                         meridiem: false,
                     }}
                     themeSystem="bootstrap5"
-                    initialView="timeGridWeek"
+                    initialView="timeGridDay"
                     selectable={true}
                     hiddenDays={[0]}
                     allDaySlot={false}
@@ -148,12 +167,22 @@ const Agenda = () => {
                         right: "prev,next",
                     }}
                     events={appointments}
+                    expandRows={true}
+
                 />
             </div>
 
             {/* 🔹 Tabla debajo */}
             <div className="bg-dark-700 text-light rounded mt-3 p-3">
-                <h6 className="mb-3">Turnos del día</h6>
+                <h6 className="mb-3">
+                    Turnos del día –{" "}
+                    {activeDate.toLocaleDateString("es-AR", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                    })}
+                </h6>
                 <Table striped bordered hover variant="dark" size="sm" responsive>
                     <thead>
                         <tr>
@@ -167,11 +196,9 @@ const Agenda = () => {
                     <tbody>
                         {appointments
                             .filter((app: any) => {
-                                // 🔹 comparo por fecha local
-                                const appDate = new Date(app.start)
-                                    .toLocaleDateString("sv-SE"); // formato YYYY-MM-DD local
-                                const todayDate = new Date().toLocaleDateString("sv-SE");
-                                return appDate === todayDate;
+                                const appDate = new Date(app.start).toLocaleDateString("sv-SE");
+                                const tableDate = activeDate.toLocaleDateString("sv-SE");
+                                return appDate === tableDate;
                             })
                             .sort((a: any, b: any) => a.start.localeCompare(b.start))
                             .map((app: any, i: number) => (
@@ -202,7 +229,7 @@ const Agenda = () => {
                             ))}
                         {appointments.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="text-center text-muted">
+                                <td colSpan={5} className="text-center text-light">
                                     No hay turnos para hoy
                                 </td>
                             </tr>
