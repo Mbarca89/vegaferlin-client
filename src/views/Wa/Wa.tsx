@@ -94,7 +94,7 @@ const Wa = () => {
     const handleForce = async () => {
         setSending(true)
         try {
-            const res = await axiosWithToken.post(`${SERVER_URL}/api/v1/messages/force`)
+            const res = await axiosWithToken.post(`${SERVER_URL}/api/appointment/resend`)
             if (res && res.data) {
                 notifySuccess(res.data)
                 let tzoffset = (new Date()).getTimezoneOffset() * 60000
